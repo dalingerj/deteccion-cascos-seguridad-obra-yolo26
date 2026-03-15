@@ -1,61 +1,49 @@
-# Análisis de Errores — Helmet Color Detection
-
-> Nota: Este análisis está basado en observaciones cualitativas de las predicciones de validación.
-> Completar con ejemplos reales de las imágenes de predicción una vez disponibles.
+# Análisis de Errores
 
 ---
 
-## Falsos Positivos (FP) — El modelo detecta un casco que no es de esa clase
+## Falsos Positivos (FP) — El modelo predice una clase incorrecta
 
-### FP-1: `green_helmet` detectado como `yellow_helmet`
-- **Descripción:** En imágenes con iluminación cálida intensa (luz solar directa vespertina), los cascos verdes pueden adquirir una tonalidad amarillenta que confunde al clasificador.
-- **Hipótesis:** La representación de color en el espacio RGB no distingue bien entre amarillo-verde en condiciones de alto brillo. El modelo no tiene suficientes ejemplos de cascos verdes bajo luz cálida.
-- **Evidencia:** Revisar imagen `val_pred_XX.jpg` en `/results/evidence/val_predictions/`
+### FP-1: `blue_helmet` clasificado como `background` (6 casos)
+- **Qué:** 6 instancias de `blue_helmet` fueron descartadas y clasificadas como fondo.
+- **Por qué:** El azul oscuro en condiciones de sombra o lejanía reduce el contraste con fondos grises y metálicos típicos de obra. El modelo no tiene suficientes ejemplos de cascos azules en esas condiciones.
 
-### FP-2: `white_helmet` detectado donde no hay casco
-- **Descripción:** Objetos blancos en el fondo de la obra (bolsas de cemento, bidones, superficies pintadas) son etiquetados como cascos blancos.
-- **Hipótesis:** El dataset subrepresenta fondos con objetos blancos no-casco. El modelo aprende "blanco circular" en vez de "casco blanco con forma específica".
-- **Evidencia:** Revisar imagen `val_pred_XX.jpg`
+### FP-2: `white_helmet` y `yellow_helmet` clasificados como `background` (5 y 6 casos)
+- **Qué:** Instancias de cascos blancos y amarillos no detectadas, absorbidas por la clase fondo.
+- **Por qué:** Probable oclusión parcial o cascos muy pequeños en el frame (trabajadores a distancia). Las curvas muestran variabilidad en recall durante épocas intermedias, lo que sugiere dificultad con instancias de tamaño reducido.
 
-### FP-3: `red_helmet` detectado como `yellow_helmet` en imágenes oscuras
-- **Descripción:** En imágenes con poca iluminación o tomadas con cámara de baja calidad, los cascos rojos pueden verse naranja o amarillo-ocre.
-- **Hipótesis:** La compresión JPEG degrada los canales de color rojo, acercando el valor al rango amarillo-naranja del espacio de color del modelo.
-- **Evidencia:** Revisar imagen `val_pred_XX.jpg`
+### FP-3: `green_helmet` clasificado como `background` (1 caso)
+- **Qué:** Un casco verde no detectado, absorbido por fondo.
+- **Por qué:** `green_helmet` es la clase con menor representación en el dataset. Con pocas instancias de entrenamiento, el modelo tiene menor capacidad de generalización para esta clase.
 
 ---
 
-## Falsos Negativos (FN) — El modelo no detecta un casco que sí existe
+## Falsos Negativos (FN) — El modelo no detecta un casco presente
 
-### FN-1: `green_helmet` no detectado en fondos con vegetación
-- **Descripción:** Cascos verdes ubicados frente a arbustos, árboles o zonas de vegetación no son detectados o tienen baja confianza (<0.3).
-- **Hipótesis:** El color verde del casco se "camufla" con el fondo, reduciendo el contraste en la región de interés. El modelo necesita más ejemplos de cascos verdes con fondo verde.
-- **Mejora directa:** Agregar al dataset imágenes de inspectores HSE en zonas de obra con vegetación.
+### FN-1: Cascos no detectados en escenas con múltiples personas
+- **Qué:** En escenas con grupos de trabajadores, algunas detecciones son parciales (se detecta 1 de 3 cascos visibles).
+- **Por qué:** Oclusión entre personas y solapamiento de bounding boxes reduce la confianza del modelo por debajo del umbral de 0.25.
 
-### FN-2: Cascos pequeños no detectados (distancia larga)
-- **Descripción:** En imágenes panorámicas de obra donde los trabajadores están lejos de la cámara, los cascos ocupan <20×20px y no son detectados.
-- **Hipótesis:** YOLOv8n tiene menor sensibilidad a objetos muy pequeños. El modelo fue entrenado principalmente con cascos de tamaño mediano-grande en el frame.
-- **Mejora directa:** Aumentar proporción de imágenes con cascos pequeños; considerar `imgsz=1280` en entrenamiento.
+### FN-2: `green_helmet` con recall bajo
+- **Qué:** Solo 4 detecciones correctas de `green_helmet` en validación.
+- **Por qué:** Dataset desbalanceado — `green_helmet` tiene significativamente menos instancias que `white_helmet` (18) o `yellow_helmet` (16).
 
-### FN-3: `blue_helmet` no detectado cuando está parcialmente ocluido
-- **Descripción:** Cascos azules cubiertos parcialmente por andamios, columnas u otros trabajadores generan recall bajo para esa clase.
-- **Hipótesis:** El dataset tiene pocas instancias de cascos azules con oclusión parcial. La clase `blue_helmet` también es la menos frecuente, lo que impacta directamente en recall.
-- **Mejora directa:** Añadir imágenes con oclusiones parciales para todas las clases, especialmente azul.
+### FN-3: Cascos vistos desde atrás o en ángulo bajo
+- **Qué:** Casos donde el casco es visible pero desde atrás generan confianza baja (ej: `red_helmet 0.6`).
+- **Por qué:** El dataset probablemente tiene mayoría de imágenes frontales o de 3/4. La variación de ángulo no está suficientemente cubierta.
 
 ---
 
 ## 3 Mejoras Prioritarias del Dataset
 
-### Mejora 1 — Aumentar diversidad de condiciones de iluminación
-- **Problema vinculado:** FP-1, FP-3
-- **Acción concreta:** Añadir 30–50 imágenes por clase tomadas en: iluminación nocturna con reflectores, interior de edificio (luz artificial), contraluz y amanecer/atardecer.
-- **Fuente sugerida:** Unsplash + búsqueda específica en Google Images con filtro de licencia Creative Commons.
+### Mejora 1 — Balancear las clases
+- **Problema vinculado:** FP-3, FN-2
+- **Acción:** Llevar todas las clases a un mínimo de 15–20 instancias de validación. Priorizar `green_helmet` y `blue_helmet` con nuevas imágenes o data augmentation con hue shift controlado.
 
-### Mejora 2 — Aumentar representación de `green_helmet` y `blue_helmet`
-- **Problema vinculado:** FN-1, FN-3
-- **Acción concreta:** Las clases con menor cantidad de instancias deben equipararse. Objetivo: mínimo 80 instancias de entrenamiento por clase. Aplicar data augmentation específico (hue shift suave) para green y blue.
-- **Fuente sugerida:** Buscar imágenes de "HSE inspector construction site" y "construction supervisor blue helmet".
+### Mejora 2 — Incorporar imágenes con oclusión y grupos
+- **Problema vinculado:** FP-2, FN-1
+- **Acción:** Añadir imágenes panorámicas de obra con múltiples trabajadores en cuadro, incluyendo oclusiones parciales naturales entre personas.
 
-### Mejora 3 — Incluir imágenes con cascos pequeños y ocluidos
-- **Problema vinculado:** FN-2, FN-3
-- **Acción concreta:** Añadir al dataset 20–30 imágenes panorámicas de obras donde los trabajadores aparecen a distancia. Incluir también imágenes de multitudes o grupos donde se producen oclusiones naturales.
-- **Configuración adicional:** Evaluar re-entrenamiento con `imgsz=1280` para mejorar detección de instancias pequeñas.
+### Mejora 3 — Diversificar ángulos de captura
+- **Problema vinculado:** FN-3
+- **Acción:** Incluir imágenes con cascos vistos desde atrás, desde altura (dron) y en ángulo picado. Esto mejora la robustez ante cámaras de seguridad con montaje elevado, caso de uso frecuente en obras reales.
