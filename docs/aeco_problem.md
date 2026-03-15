@@ -1,5 +1,3 @@
 # Contexto del Problema
 
-En el sector de la construcción (AECO), el color del casco de seguridad es un estándar internacional
-que identifica el rol del portador dentro de la obra. Este sistema permite al modelo de visión
-artificial inferir la composición de roles presentes en una escena.
+En obras de construcción, el color del casco identifica el rol de cada trabajador. Identificar automáticamente qué roles están presentes en una imagen permite mejorar el monitoreo de seguridad, verificar la presencia de supervisores y detectar accesos no autorizados.
