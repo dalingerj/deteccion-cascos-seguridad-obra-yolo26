@@ -66,7 +66,7 @@ dataset = version.download("yolo26")
    - Celda 4 (Validate fine-tuned model): Evaluación del modelo best.pt obtenido y métricas
    - Celda 5 (Inference with custom model): Inferencia de imágenes proporcionadas por el usuario
    
-     *Cargar imagen personalizada en:*
+     *Cargar conjunto de imagenes personalizadas en:*
    
    ```python
    /content/datasets/m4t3-helmet-role-detection-1/test_random_img/images
