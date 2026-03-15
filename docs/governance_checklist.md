@@ -1,7 +1,7 @@
 # Checklist de Gobernanza y Licencias
 
-**Proyecto:** Helmet Color Detection — Detección de Roles en Obra por Color de Casco  
-**Autor:** [Tu nombre]  
+**Proyecto:** Deteccion de Cascos de Seguridad en Obra — Detección de Roles en Obra por Color de Casco  
+**Autor:** Jonathan Dalinger
 **Fecha:** Marzo 2026  
 **Versión:** 1.0
 
@@ -23,7 +23,7 @@
 
 | Ítem | Estado | Notas |
 |---|---|---|
-| Solo se recopilan imágenes necesarias para el objetivo de detección de cascos | ✅ | ~[N] imágenes totales, suficiente para el problema |
+| Solo se recopilan imágenes necesarias para el objetivo de detección de cascos | ✅ | ~150 imágenes totales, suficiente para el problema |
 | No se almacenan metadatos de geolocalización ni información EXIF sensible | ✅ | Imágenes descargadas sin EXIF de identificación |
 | El dataset no se comparte públicamente sin revisión de privacidad | ⚠️ | Dataset en Roboflow con acceso controlado |
 
@@ -35,7 +35,7 @@ Este modelo **no debe utilizarse** en los siguientes contextos:
 
 1. **Toma de decisiones de seguridad en tiempo real sin supervisión humana:** El modelo puede generar falsos negativos (no detectar un casco presente). Usarlo como único control de acceso o seguridad sin revisión humana representa un riesgo inaceptable.
 
-2. **Condiciones de iluminación extrema:** El modelo fue entrenado principalmente con imágenes diurnas, con saturacion, tono, brillo y contraste constante. Su rendimiento en condiciones de iluminacion atipicas no está validado.
+2. **Condiciones de iluminación extrema:** El modelo fue entrenado principalmente con imágenes diurnas, con saturacion, tono, brillo y contraste constante. No se recomienda su implementacion bajo condiciones de iluminacion atipicas.
 
 3. **Obras con convenciones de color no estándar:** El esquema de colores asumido (blanco=ingeniería, amarillo=operario, etc.) puede variar según país, empresa o normativa local. El modelo no es transferible sin re-etiquetado.
 
@@ -52,8 +52,6 @@ Este modelo **no debe utilizarse** en los siguientes contextos:
 | **Falso Negativo (FN)** — No detectar un casco | No se registra la presencia de un rol. Ej: no se detecta que un inspector HSE abandonó la zona. | 🔴 Alta |
 | **Falso Positivo (FP)** — Detectar una clase incorrecta | Se asigna un rol incorrecto. Ej: un operario es identificado como supervisor. | 🟡 Media |
 
-**Conclusión de riesgo:** En aplicaciones de seguridad laboral, los **falsos negativos son más críticos** que los falsos positivos, ya que implican que una situación de riesgo no es detectada. Se recomienda operar con umbrales de confianza bajos (conf=0.25) para maximizar recall a expensas de precisión, y complementar con revisión humana.
-
 ---
 
 ## 5. Declaración de Licencia
@@ -62,7 +60,7 @@ Este modelo **no debe utilizarse** en los siguientes contextos:
 Este repositorio se distribuye bajo licencia **MIT**.
 
 ```
-MIT License — Copyright (c) 2026 [Tu nombre]
+MIT License — Copyright (c) 2026 Jonathan Dalinger
 Se permite el uso, copia, modificación y distribución con o sin fines comerciales,
 siempre que se mantenga el aviso de copyright original.
 ```
@@ -72,9 +70,7 @@ siempre que se mantenga el aviso de copyright original.
 |---|---|---|
 | Imágenes base | [Unsplash](https://unsplash.com) | [Unsplash License](https://unsplash.com/license) — uso libre incluyendo fines educativos |
 | Anotaciones (bounding boxes) | Elaboración propia | MIT (incluidas en este repositorio) |
-| Modelo pre-entrenado base | Ultralytics YOLOv8 | [AGPL-3.0](https://github.com/ultralytics/ultralytics/blob/main/LICENSE) |
-
-> ⚠️ **Nota sobre AGPL-3.0:** Ultralytics YOLOv8 está licenciado bajo AGPL-3.0 para uso open-source. Para usos comerciales, se requiere una licencia comercial de Ultralytics. Este proyecto es de uso académico/educativo.
+| Modelo pre-entrenado base | Ultralytics YOLO26 | [AGPL-3.0](https://github.com/ultralytics/ultralytics/blob/main/LICENSE) |
 
 ---
 
@@ -82,6 +78,8 @@ siempre que se mantenga el aviso de copyright original.
 
 Este modelo fue desarrollado con fines **exclusivamente académicos** en el marco de la Maestría en Inteligencia Artificial Aplicada a la Arquitectura y Construcción (Zigurat, 2026). No se garantiza su uso en entornos productivos sin validación adicional.
 
-**Responsable del proyecto:** [Tu nombre]  
-**Institución:** Zigurat Institute of Technology  
+**Responsable del proyecto:** Jonathan Dalinger
+
+**Institución:** Zigurat Institute of Technology 
+
 **Año:** 2026
