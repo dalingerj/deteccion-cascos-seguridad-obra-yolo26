@@ -1,8 +1,11 @@
 # Checklist de Gobernanza y Licencias
 
 **Proyecto:** Detección de Cascos de Seguridad en Obra – Rol x Color 
+
 **Autor:** Jonathan Dalinger
+
 **Fecha:** Marzo 2026  
+
 **Versión:** 1.0
 
 ---
