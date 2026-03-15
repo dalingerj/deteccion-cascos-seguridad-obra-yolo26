@@ -1,6 +1,6 @@
 # Checklist de Gobernanza y Licencias
 
-**Proyecto:** Deteccion de Cascos de Seguridad en Obra — Detección de Roles en Obra por Color de Casco  
+**Proyecto:** Detección de Cascos de Seguridad en Obra – Rol x Color
 **Autor:** Jonathan Dalinger
 **Fecha:** Marzo 2026  
 **Versión:** 1.0
